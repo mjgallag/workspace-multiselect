@@ -79,6 +79,10 @@ export class Multiselect {
       ws.addChangeListener(this.eventListenerAllWrapper_);
     });
 
+    this.onWorkspaceClickWrapper_ = this.onWorkspaceClick_.bind(this);
+    this.workspace_.getParentSvg().addEventListener(
+        'pointerdown', this.onWorkspaceClickWrapper_, true);
+
     if (options.multiselectCopyPaste &&
         options.multiselectCopyPaste.crossTab === false) {
       this.useCopyPasteCrossTab_ = false;
@@ -130,6 +134,14 @@ export class Multiselect {
       Shortcut.unregisterOurShortcut();
       this.registeredShortcut_ = false;
     }
+
+    const ws = this.workspace_;
+    const orig = ws.lookUpFocusableNode.bind(ws);
+    this.originalLookUpFocusableNode_ = orig;
+    ws.lookUpFocusableNode = (id) => {
+      const md = multiDraggableWeakMap.get(ws);
+      return md?.focusElement_?.id === id ? md : orig(id);
+    };
   }
 
   /**
@@ -169,6 +181,11 @@ export class Multiselect {
    * @param {boolean} keepRegistry Keep the context menu and shortcut registry.
    */
   dispose(keepRegistry = false) {
+    if (this.originalLookUpFocusableNode_) {
+      this.workspace_.lookUpFocusableNode = this.originalLookUpFocusableNode_;
+      this.originalLookUpFocusableNode_ = null;
+    }
+
     if (this.onKeyDownWrapper_) {
       Blockly.browserEvents.unbind(this.onKeyDownWrapper_);
       this.onKeyDownWrapper_ = null;
@@ -190,6 +207,11 @@ export class Multiselect {
         ws.removeChangeListener(this.eventListenerAllWrapper_);
       });
       this.eventListenerAllWrapper_ = null;
+    }
+    if (this.onWorkspaceClickWrapper_) {
+      this.workspace_.getParentSvg().removeEventListener(
+          'pointerdown', this.onWorkspaceClickWrapper_, true);
+      this.onWorkspaceClickWrapper_ = null;
     }
     if (!keepRegistry) {
       ContextMenu.unregisterContextMenu();
@@ -364,13 +386,25 @@ export class Multiselect {
    * @private
    */
   eventListenerAll_(e) {
-    // on Block Selected (must listen events of all workspaces
-    // to cover all possible selection changes)
     if (e.type === Blockly.Events.SELECTED) {
       multiselectControlsList.forEach((controls) => {
         controls.updateMultiselect();
       });
     }
+  }
+
+  onWorkspaceClick_(e) {
+    if (e.button !== 0 || inMultipleSelectionModeWeakMap.get(this.workspace_)) return;
+    const dragSelection = dragSelectionWeakMap.get(this.workspace_);
+    if (!dragSelection || dragSelection.size <= 1) return;
+    if (e.target.closest('[data-id]')) return;
+
+    const multiDraggable = multiDraggableWeakMap.get(this.workspace_);
+    if (!multiDraggable) return;
+    for (const [draggable] of multiDraggable.subDraggables) draggable.unselect();
+    multiDraggable.clearAll_();
+    dragSelection.clear();
+    Blockly.getFocusManager().focusNode(this.workspace_);
   }
 
   /**
@@ -431,6 +465,11 @@ export class Multiselect {
    */
   onBlur_(e) {
     if (inMultipleSelectionModeWeakMap.get(this.workspace_)) {
+      const injectionDiv = this.workspace_.getInjectionDiv();
+      if (!e.relatedTarget || injectionDiv.contains(e.relatedTarget)) {
+        return;
+      }
+
       // Revert last unselected block if the related target
       // is a field related element, for accomodating field update
       // directly while the multi-selection mode is on.

@@ -493,7 +493,7 @@ const registerSelectAll = function() {
         } else {
           Blockly.getSelected().unselect();
         }
-        Blockly.common.setSelected(null);
+        Blockly.getFocusManager().focusNode(workspace);
         multiDraggable.clearAll_();
         dragSelectionWeakMap.get(workspace).clear();
       }

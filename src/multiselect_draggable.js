@@ -30,7 +30,19 @@ export class MultiselectDraggable {
     this.loc = new Blockly.utils.Coordinate(0, 0);
     this.connectionDBList = [];
     this.dragSelection = dragSelectionWeakMap.get(workspace);
+
+    this.focusElement_ = Blockly.utils.dom.createSvgElement(
+        Blockly.utils.Svg.RECT,
+        {id: `multiselect-focus-${this.id}`, width: 0, height: 0,
+          style: 'pointer-events:none', tabindex: -1},
+        workspace.getCanvas());
   }
+
+  canBeFocused() { return true; }
+  getFocusableElement() { return this.focusElement_; }
+  getFocusableTree() { return this.workspace; }
+  onNodeFocus() { for (const [d] of this.subDraggables) d.select(); }
+  onNodeBlur() {}
 
   /**
    * Clears everything in the subDraggables
@@ -137,10 +149,7 @@ export class MultiselectDraggable {
    * @returns {boolean} Returns true as it is always movable
    */
   isMovable() {
-    if (inMultipleSelectionModeWeakMap.get(this.workspace)) {
-      return false;
-    }
-    return true;
+    return !inMultipleSelectionModeWeakMap.get(this.workspace);
   }
 
   /**
@@ -263,15 +272,8 @@ export class MultiselectDraggable {
    * multiselect_controls.js
    */
   select() {
-    // This needs to be worked on to see if we can make the
-    // highlighting of the subdraggables in real time.
     for (const draggable of this.subDraggables) {
-      if (draggable[0] instanceof Blockly.BlockSvg &&
-          !draggable[0].isShadow()) {
-        draggable[0].select();
-      } else {
-        draggable[0].select();
-      }
+      draggable[0].select();
     }
   }
 

@@ -363,8 +363,11 @@ export class MultiselectControls {
    * Update the multiple selection blocks status.
    */
   updateMultiselect() {
+    const isInMode = inMultipleSelectionModeWeakMap.get(this.workspace_);
+    const selected = Blockly.getSelected();
+
     // Not in multiselect mode
-    if (!inMultipleSelectionModeWeakMap.get(this.workspace_)) {
+    if (!isInMode) {
       // If clicking on different workspace, clear selected set
       if (this.workspace_.id !== Blockly.getMainWorkspace().id) {
         this.multiDraggable.clearAll_();
@@ -387,21 +390,15 @@ export class MultiselectControls {
         }
         this.multiDraggable.clearAll_();
         this.dragSelection.clear();
-        Blockly.common.setSelected(null);
-      } else if (Blockly.getSelected() &&
-          !(Blockly.getSelected() instanceof MultiselectDraggable)) {
-        // Blockly.getSelected() is not a multiselectDraggable
-        // and selected block is not in dragSelection
-        if (this.dragSelection.size > 1) {
-          // Preserve multiselection when shift held on right click
-          Blockly.common.setSelected(this.multiDraggable);
+      } else if (selected && !(selected instanceof MultiselectDraggable)) {
+        const inSelection = selected.id && this.dragSelection.has(selected.id);
+        if (this.dragSelection.size > 1 && inSelection) {
+          Blockly.getFocusManager().focusNode(this.multiDraggable);
         } else {
-          for (const draggable of this.multiDraggable.subDraggables) {
-            draggable[0].unselect();
-          }
+          for (const [d] of this.multiDraggable.subDraggables) d.unselect();
           this.multiDraggable.clearAll_();
           this.dragSelection.clear();
-          this.lastSelectedElement_ = Blockly.getSelected();
+          this.lastSelectedElement_ = selected;
           inPasteShortcut.set(this.workspace_, false);
         }
       }
@@ -420,7 +417,7 @@ export class MultiselectControls {
           MultiselectDraggable)) {
         if (Blockly.getSelected() instanceof Blockly.BlockSvg &&
             !Blockly.getSelected().isShadow()) {
-          Blockly.common.setSelected(null);
+          Blockly.getFocusManager().focusNode(this.workspace_);
         }
         // TODO: Look into this after gesture has been updated at Blockly
         // Currently, the setSelected is called twice even with selection of
