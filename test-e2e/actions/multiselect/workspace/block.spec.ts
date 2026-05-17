@@ -263,9 +263,9 @@ test("drag blocks to trash", async ({ page, act }) => {
 	expect(await getSelectedId(page)).toBe(await getMultiselectDraggableId(page));
 
 	await openTrash(page);
-	await getBlock(page, { type: "logic_boolean", workspace: "trash" });
-	await getBlock(page, { type: "math_arithmetic", workspace: "trash" });
-	await getBlock(page, { type: "logic_compare", workspace: "trash" });
+	await getBlock(page, { type: "logic_boolean", scope: "top", workspace: { name: "trash" } });
+	await getBlock(page, { type: "math_arithmetic", scope: "top", workspace: { name: "trash" } });
+	await getBlock(page, { type: "logic_compare", scope: "top", workspace: { name: "trash" } });
 });
 
 test("drag blocks to backpack", async ({ page, act }) => {
@@ -305,12 +305,12 @@ test("drag blocks to backpack", async ({ page, act }) => {
 	expect(block3BoundsEnd.top).toBeCloseTo(block3BoundsStart.top);
 
 	await openBackpack(page);
-	await getBlock(page, { type: "logic_boolean", workspace: "backpack" });
-	await getBlock(page, { type: "math_arithmetic", workspace: "backpack" });
-	await getBlock(page, { type: "logic_compare", workspace: "backpack" });
+	await getBlock(page, { type: "logic_boolean", scope: "top", workspace: { name: "backpack" } });
+	await getBlock(page, { type: "math_arithmetic", scope: "top", workspace: { name: "backpack" } });
+	await getBlock(page, { type: "logic_compare", scope: "top", workspace: { name: "backpack" } });
 	await expect(
-		getBlock(page, { type: "math_number", workspace: "backpack" }),
-	).rejects.toThrow('Block type "math_number" not found');
+		getBlock(page, { type: "math_number", scope: "top", workspace: { name: "backpack" } }),
+	).rejects.toThrow("Block not found");
 });
 
 test("undo via keyboard", async ({ page, act }) => {
