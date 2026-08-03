@@ -20,7 +20,6 @@ import {
 import {MultiselectControls} from './multiselect_controls';
 import {MultiselectDraggable} from './multiselect_draggable';
 import {MultiselectNavigationPolicy} from './multiselect_navigation_policy';
-import {applyShortcutKeybindings} from './navigation_shortcut_keybindings';
 
 /**
  * Class for using multiple select blocks on workspace.
@@ -140,22 +139,12 @@ export class Multiselect {
 
   }
 
-  onKeyboardNavigationInit(options = {}) {
+  onKeyboardNavigationInit() {
     ContextMenu.registerOurKeyboardNavigationMenuItems(this.useCopyPasteCrossTab_);
     Shortcut.registerDuplicateShortcut();
     this.navigationPolicy_ = new MultiselectNavigationPolicy();
     this.workspace_.getNavigator().addNavigationPolicy(this.navigationPolicy_);
     this.navigationPolicy_.install();
-
-    if (options.shortcutKeybindings) {
-      if (!options.instance) {
-        throw new Error(
-            'KeyboardNavigation instance required when using shortcutKeybindings');
-      }
-      applyShortcutKeybindings(options.shortcutKeybindings);
-      options.instance.navigationController
-          .shortcutDialog.createModalContent();
-    }
   }
 
   /**

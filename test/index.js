@@ -43,21 +43,8 @@ function createWorkspace(blocklyDiv, options) {
   multiselectPlugin.init(options);
 
   // Initialize keyboard navigation plugin.
-  const keyboardNav = new KeyboardNavigation(workspace, {allowCrossWorkspacePaste: true});
-  multiselectPlugin.onKeyboardNavigationInit({
-    // instance: keyboardNav,
-    // shortcutKeybindings: {
-    //   toolbox: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.T],
-    //   clean_up_workspace: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.C],
-    //   list_shortcuts: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.SLASH],
-    //   disconnect: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.X],
-    //   start_move: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.M],
-    //   duplicate: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.D],
-    //   next_stack: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.N],
-    //   previous_stack: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.B],
-    //   to_workspace: [Blockly.utils.KeyCodes.ALT, Blockly.utils.KeyCodes.W],
-    // },
-  });
+  new KeyboardNavigation(workspace, {allowCrossWorkspacePaste: true});
+  multiselectPlugin.onKeyboardNavigationInit();
 
   return workspace;
 }
