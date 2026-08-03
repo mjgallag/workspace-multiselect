@@ -106,7 +106,10 @@ export class Multiselect {
       this.useCopyPasteMenu_ = false;
     }
 
+    this.navigationPolicy_ = new MultiselectNavigationPolicy();
+    this.workspace_.getNavigator().addNavigationPolicy(this.navigationPolicy_);
     if (!Blockly.ContextMenuRegistry.registry.getItem('workspaceSelectAll')) {
+      this.navigationPolicy_.install();
       ContextMenu.unregisterContextMenu();
       ContextMenu.registerOurContextMenu(this.useCopyPasteMenu_,
           this.useCopyPasteCrossTab_);
@@ -137,14 +140,8 @@ export class Multiselect {
       Blockly.BlockSvg.prototype.bumpNeighbours = function() {};
     }
 
-  }
-
-  onKeyboardNavigationInit() {
     ContextMenu.registerOurKeyboardNavigationMenuItems(this.useCopyPasteCrossTab_);
     Shortcut.registerDuplicateShortcut();
-    this.navigationPolicy_ = new MultiselectNavigationPolicy();
-    this.workspace_.getNavigator().addNavigationPolicy(this.navigationPolicy_);
-    this.navigationPolicy_.install();
   }
 
   /**

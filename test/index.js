@@ -14,7 +14,6 @@ import {Multiselect} from '../src/index';
 import {multiDraggableWeakMap} from '../src/global';
 window.multiDraggableWeakMap = multiDraggableWeakMap;
 import {Backpack} from '@blockly/workspace-backpack';
-import {KeyboardNavigation} from '@blockly/keyboard-navigation';
 
 /**
  * Create a workspace.
@@ -42,25 +41,10 @@ function createWorkspace(blocklyDiv, options) {
   const multiselectPlugin = new Multiselect(workspace);
   multiselectPlugin.init(options);
 
-  // Initialize keyboard navigation plugin.
-  new KeyboardNavigation(workspace, {allowCrossWorkspacePaste: true});
-  multiselectPlugin.onKeyboardNavigationInit();
-
   return workspace;
 }
 
 Blockly.ContextMenuItems.registerCommentOptions();
-KeyboardNavigation.registerKeyboardNavigationStyles();
-class NavigationDeferringToolbox extends Blockly.Toolbox {
-  onKeyDown_() {}
-}
-Blockly.registry.register(
-    Blockly.registry.Type.TOOLBOX,
-    Blockly.registry.DEFAULT,
-    NavigationDeferringToolbox,
-    true,
-);
-KeyboardNavigation.registerFlyoutCursor();
 
 Blockly.Blocks['radix'] = {
   init() {

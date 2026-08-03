@@ -120,7 +120,6 @@ scope of its wrapped input function.
 - [x] Backpack (Need to update UI in Backpack plugin side)
 
 **Workspace-related**
-- [x] Keyboard-navigation
 - [x] Shadow-block-converter
 - [x] Workspace-content-highlight
 - [x] Disable-top-blocks
@@ -133,17 +132,6 @@ scope of its wrapped input function.
 
 For more information, please check out the following [issue page](https://github.com/mit-cml/workspace-multiselect/issues/50).
 
-### Note on keyboard navigation plugin
-The keyboard navigation plugin must be initialized after the multiselect plugin. Set `multiselectCopyPaste.menu` to `false` to avoid duplicate clipboard context menu items, pass `allowCrossWorkspacePaste: true` to keyboard navigation, and call `onKeyboardNavigationInit()` after:
-
-```javascript
-const multiselectPlugin = new Multiselect(workspace);
-multiselectPlugin.init({multiselectCopyPaste: {menu: false}});
-
-new KeyboardNavigation(workspace, {allowCrossWorkspacePaste: true});
-multiselectPlugin.onKeyboardNavigationInit();
-```
-
 ### Note on disable top blocks plugin
 The disable top blocks plugin has to be initialized after the multiselect plugin. The main reason behind this is that 
 the multiselect plugin has its own custom context menu, which allows for the disabling of any blocks (not just top blocks).
@@ -153,7 +141,6 @@ customization. If we install the disable top blocks plugin after the multiselect
 ## API
 
 - `Multiselect.init`: Initialize the plugin.
-- `Multiselect.onKeyboardNavigationInit`: Call after initializing the keyboard navigation plugin.
 - `Multiselect.dispose`: Dispose the plugin.
 - `MultiselectDraggable`: The customized draggable object unique to each workspace that contains the blocks in the multiselection.
 - `dragSelectionWeakMap`: The WeakMap storing set of currently selected block ids by workspace svg.
